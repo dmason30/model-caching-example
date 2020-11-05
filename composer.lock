@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "a35bfeef2708c558f9b38235f52ec158",
+    "content-hash": "d7b1156c92c785939eea702d75f023f1",
     "packages": [
         {
             "name": "asm89/stack-cors",
@@ -587,16 +587,16 @@
         },
         {
             "name": "genealabs/laravel-model-caching",
-            "version": "0.11.0",
+            "version": "dev-master",
             "source": {
                 "type": "git",
-                "url": "https://github.com/GeneaLabs/laravel-model-caching.git",
-                "reference": "f790e9c8ef7097b39bcf893c1e7335763cb812f3"
+                "url": "https://github.com/dmason30/laravel-model-caching.git",
+                "reference": "28bf06f7ae7f8592037170399b6e71cedda09698"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/GeneaLabs/laravel-model-caching/zipball/f790e9c8ef7097b39bcf893c1e7335763cb812f3",
-                "reference": "f790e9c8ef7097b39bcf893c1e7335763cb812f3",
+                "url": "https://api.github.com/repos/dmason30/laravel-model-caching/zipball/28bf06f7ae7f8592037170399b6e71cedda09698",
+                "reference": "28bf06f7ae7f8592037170399b6e71cedda09698",
                 "shasum": ""
             },
             "require": {
@@ -624,6 +624,7 @@
                 "squizlabs/php_codesniffer": "^3.4",
                 "symfony/thanks": "^1.2"
             },
+            "default-branch": true,
             "type": "library",
             "extra": {
                 "laravel": {
@@ -637,7 +638,15 @@
                     "GeneaLabs\\LaravelModelCaching\\": "src/"
                 }
             },
-            "notification-url": "https://packagist.org/downloads/",
+            "autoload-dev": {
+                "classmap": [
+                    "tests/database/factories",
+                    "tests/database/seeds"
+                ],
+                "psr-4": {
+                    "GeneaLabs\\LaravelModelCaching\\Tests\\": "tests/"
+                }
+            },
             "license": [
                 "MIT"
             ],
@@ -649,10 +658,9 @@
             ],
             "description": "Automatic caching for Eloquent models.",
             "support": {
-                "issues": "https://github.com/GeneaLabs/laravel-model-caching/issues",
-                "source": "https://github.com/GeneaLabs/laravel-model-caching/tree/0.11.0"
+                "source": "https://github.com/dmason30/laravel-model-caching/tree/master"
             },
-            "time": "2020-09-08T15:51:40+00:00"
+            "time": "2020-11-05T16:21:57+00:00"
         },
         {
             "name": "genealabs/laravel-pivot-events",
@@ -7376,7 +7384,9 @@
     ],
     "aliases": [],
     "minimum-stability": "dev",
-    "stability-flags": [],
+    "stability-flags": {
+        "genealabs/laravel-model-caching": 20
+    },
     "prefer-stable": true,
     "prefer-lowest": false,
     "platform": {
