@@ -1,0 +1,85 @@
+name: "Run Tests"
+
+on:
+  pull_request:
+  push:
+
+jobs:
+  test:
+
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        php: [7.3, 7.4]
+        mysql: [8.0]
+        node: [13.x]
+
+    name: PHP ${{ matrix.php }} / MySQL ${{ matrix.mysql }} / Node ${{ matrix.node }}
+
+    services:
+      mysql:
+        image: mysql:${{ matrix.mysql }}
+        env:
+          MYSQL_ALLOW_EMPTY_PASSWORD: yes
+          MYSQL_DATABASE: tmc_test
+        ports:
+          - 3306
+        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Cache composer dependencies
+        uses: actions/cache@v1
+        with:
+          path: ~/.composer/cache/files
+          key: dependencies-php-${{ matrix.php }}-composer-${{ hashFiles('**/composer.lock') }}
+          restore-keys: |
+            dependencies-php-${{ matrix.php }}-composer-
+
+      - name: Get yarn cache directory path
+        id: yarn-cache-dir-path
+        run: echo "::set-output name=dir::$(yarn cache dir)"
+
+      - name: Cache yarn dependencies
+        uses: actions/cache@v1
+        with:
+          path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
+          key: dependencies-js-${{ matrix.node }}-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: |
+            dependencies-js-${{ matrix.node }}-yarn-
+
+      - name: Setup PHP ${{ matrix.php }}
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          extensions: ctype, curl, date, dom, fileinfo, filter, gd, hash, iconv, intl, json, libxml, mbstring, openssl, pcntl, pcre, pdo, pdo_sqlite, phar, posix, simplexml, spl, sqlite, tokenizer, tidy, xml, xmlreader, xmlwriter, zip, zlib
+          coverage: pcov
+
+      - name: Reset MySQL root user authentication method
+        run: mysql --host 127.0.0.1 --port ${{ job.services.mysql.ports[3306] }} -uroot -e "alter user 'root'@'%' identified with mysql_native_password by ''"
+
+      - name: Setup Node.js ${{ matrix.node }}
+        uses: actions/setup-node@v1
+        with:
+          node-version: ${{ matrix.node }}
+
+      - name: Install yarn
+        run: npm install -g yarn
+
+      - name: Prepare Laravel Application
+        run: cp .env.example .env
+
+      - name: Install PHP dependencies (composer)
+        run: composer install --no-interaction --no-suggest
+
+      - name: Install JavaScript dependencies (yarn)
+        run: yarn --frozen-lockfile
+
+      - name: Execute PHP tests
+        run: composer test
+        env:
+          DB_HOST: 127.0.0.1
+          DB_PORT: ${{ job.services.mysql.ports[3306] }}
